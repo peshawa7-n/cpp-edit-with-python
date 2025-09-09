@@ -9,4 +9,3 @@ extern "C" {
         std::cout << "Hello from C++!" << std::endl;
     }
 }
-
