@@ -18,14 +18,13 @@
 
 # # Run the Python app
 # CMD ["python", "main.py"]
-
-# Use official Python base image with Linux
+# Use official Python base image
 FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install build tools and OpenCV development libraries
+# Install system dependencies: build tools and OpenCV development libraries
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -44,9 +43,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Compile the C++ file into a shared library
 RUN g++ -shared -fPIC -o video_editor.so video_editor.cpp `pkg-config --cflags --libs opencv4`
 
-# Expose a volume for video files (optional)
-VOLUME ["/app/videos"]
-
-# Run Python script as the default command
-CMD ["python", "main.py"]
-
+# Default comma
