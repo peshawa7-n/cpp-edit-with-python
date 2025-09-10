@@ -22,6 +22,7 @@ video_lib.edit_video.restype = ctypes.c_int  # return type
 
 api_id = os.getenv("APITELEGRAM_ID")
 api_hash = os.getenv("APITELEGRAM_HASH")
+phone_number = os.getenv("PHONE_NUMBER")
 channel_to_send = -1002956642937
 session = "superman.session"
 
