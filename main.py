@@ -26,11 +26,11 @@ channel_to_send = -1002956642937
 
 DOWNLOADS_DIR = "downloads100"
 os.makedirs(DOWNLOADS_DIR, exist_ok=True)
-client = TelegramClient("superman", api_id, api_hash)
+client = TelegramClient("superman.session", api_id, api_hash)
 
 session_file = "myaccount.session"
-print("Session file exists:", os.path.exists("superman"))
-print("Full path:", os.path.abspath("superman"))
+print("Session file exists:", os.path.exists("superman.session"))
+print("Full path:", os.path.abspath("superman.session"))
 
 client.start()
 
