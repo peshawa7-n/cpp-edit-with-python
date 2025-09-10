@@ -33,7 +33,7 @@ DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # Create the Telegram client
-client = TelegramClient("session_name", API_ID, API_HASH)
+client = TelegramClient("session_name.session", API_ID, API_HASH)
 
 async def download_media_from_chat(chat_username, limit=10):
     """
