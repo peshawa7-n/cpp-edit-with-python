@@ -19,42 +19,93 @@ video_lib.edit_video.argtypes = [
 video_lib.edit_video.restype = ctypes.c_int  # return type
 
 # ------------------------------------------------------------------------------
-# Load environment variables
-load_dotenv()
 
-API_ID = int(os.getenv("API_ID"))
-API_HASH = os.getenv("API_HASH")
+api_id = os.getenv("APITELEGRAM_ID")
+api_hash = os.getenv("APITELEGRAM_HASH")
+channel_to_send = -1002956642937
 
-# Directory to save downloads
-DOWNLOAD_DIR = "downloads"
+DOWNLOADS_DIR = "downloads100"
+os.makedirs(DOWNLOADS_DIR, exist_ok=True)
+client = TelegramClient("session_name.session", api_id, api_hash)
+client.start()
 
-# Ensure download folder exists
-os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-# Create the Telegram client
-client = TelegramClient("session_name.session", API_ID, API_HASH)
-
-async def download_media_from_chat(chat_username, limit=10):
+def create_path(path_str):
     """
-    Downloads media from a given Telegram chat.
+    Create each directory in the given path one by one if it doesn't exist.
+    Example: sponsor/taste/i
     """
-    print(f"Connecting to Telegram...")
-    await client.start()
+    parts = path_str.split(os.sep)  # split by folder separator (/ or \)
+    current_path = ""
 
-    print(f"Fetching messages from {chat_username}...")
+    for part in parts:
+        if not part:  # skip empty parts (e.g., if path starts with /)
+            continue
+        current_path = os.path.join(current_path, part)
+        if not os.path.exists(current_path):
+            os.mkdir(current_path)
+            print(f"Created: {current_path}")
+        else:
+            print(f"Exists: {current_path}")
 
-    # Loop through messages and download media
-    async for message in client.iter_messages(chat_username, limit=limit):
-        if message.media:  # Only download if message contains media
-            file_path = await message.download_media(file=DOWNLOAD_DIR)
-            print(f"Downloaded: {file_path}")
 
-    print("Download completed!")
+def get_available_filename(base_name, ext=".mp4"):
+    i = 1
+    filename = f"{base_name}{ext}"
+    while os.path.exists(filename):
+        filename = f"{base_name}_{i}{ext}"
+        i += 1
+    return filename
 
-# Run the script
-with client:
-    client.loop.run_until_complete(download_media_from_chat("your_channel_or_group_username", limit=20))
 
+def download_and_forward(chat, limit):
+    # isdownload = True
+    messages = client.get_messages(chat, limit=limit)
+
+    reverse_data = messages[::-1]
+
+    # all_listed_id = [message.id for message in messages if "چیرۆکی شەوێک" in message.text and message.media]
+
+    # max_id = max(all_listed_id) if all_listed_id else print("No messages found with the specified text and media.")
+
+
+    for msg in tqdm.tqdm(reverse_data):
+
+
+        # if msg.media and "چیرۆکی شەوێک" in msg.text:
+        if msg.media:
+
+
+            # for message2 in tqdm.tqdm(messages) if message2.media and "چیرۆکی شەوێک" in message2.text and message2.id == max_id:
+            #     current_max_id = msg.id
+            #     DOWNLOAD_VIDEO = message2
+
+            
+
+            try:
+                
+                print(f"\n📥 Downloading media from message ID {msg.id} {msg.text}...")
+                filename = client.download_media(msg, DOWNLOADS_DIR)
+
+                if filename:
+
+                    # edited_path = edit_video(filename)
+                    print(f"\n✅ Downloaded: {filename}")
+
+                    # Send to another channel
+                    client.send_file(channel_to_send, filename, caption=f"{msg.text}", supports_streaming=True)
+                    print(f"🚀 Sent to {channel_to_send}\n")
+
+                    # Delete file
+                    os.remove(filename)
+                    print(f"🗑️ Deleted {filename}")
+
+            except Exception as e:
+                print(f"❌ file Error : {e}")
+
+limit = 200
+source = "hadia_gull"
+download_and_forward(source, limit)
 # ------------------------------------------------------------------------------
 # Paths
 main_video = b"main_video.mp4"
