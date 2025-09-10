@@ -1,19 +1,30 @@
 import ctypes
 import os
 
-# Load the compiled library
-if os.name == "nt":  # Windows
-    lib = ctypes.CDLL("./mycpp.dll")
-else:  # Linux/Mac
-    lib = ctypes.CDLL("./mycpp.so")
+# Load compiled C++ shared library
+lib_path = os.path.abspath("./video_editor.so")  # Linux/Mac
+# For Windows use: lib_path = os.path.abspath("./video_editor.dll")
 
-# Declare the argument and return types
-lib.add.argtypes = [ctypes.c_int, ctypes.c_int]
-lib.add.restype = ctypes.c_int
+video_lib = ctypes.CDLL(lib_path)
 
-# Call the function
-result = lib.add(5, 7)
-print("Result of add:", result)
+# Define argument types
+video_lib.edit_video.argtypes = [
+    ctypes.c_char_p,  # main video path
+    ctypes.c_char_p,  # sponsor video path
+    ctypes.c_char_p,  # output video path
+    ctypes.c_double   # cut time in seconds
+]
+video_lib.edit_video.restype = ctypes.c_int  # return type
 
-# Call say_hello
-lib.say_hello()
+# Paths
+main_video = b"main_video.mp4"
+sponsor_video = b"sponsor_video.mp4"
+output_video = b"final_output.mp4"
+
+# Call the C++ function
+result = video_lib.edit_video(main_video, sponsor_video, output_video, 5.0)
+
+if result == 0:
+    print("Video edited successfully! Output:", output_video.decode())
+else:
+    print("Video editing failed.")
