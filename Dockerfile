@@ -20,29 +20,25 @@
 # CMD ["python", "main.py"]
 # Use official Python base image
 # Use official Python base image
+# Start from the official lightweight Python image
 FROM python:3.11-slim
 
-# Set working directory
+# Set environment variables to avoid Python buffering
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Set working directory inside the container
 WORKDIR /app
 
-# Install system dependencies: build tools and OpenCV dev libs
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    pkg-config \
-    libopencv-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy project files into container
+# Copy requirements and install dependencies
 COPY requirements.txt .
-COPY video_editor.cpp .
-COPY main.py .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Compile C++ to a shared library
-RUN g++ -shared -fPIC -o video_editor.so video_editor.cpp `pkg-config --cflags --libs opencv4`
+# Create folders for sessions and downloads
+RUN mkdir -p /app/sessions /app/downloads
 
-# Default command
+# Copy project files
+COPY . .
+
+# Default command to run the script
 CMD ["python", "main.py"]
