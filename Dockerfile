@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy project files into container
 COPY requirements.txt .
-COPY mycpp.cpp .
+COPY video_editor.cpp .
 COPY main.py .
 
 # Install Python dependencies
